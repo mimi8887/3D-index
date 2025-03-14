@@ -4,15 +4,15 @@ const images = [
   'club.png',
   'A2_poster_blue.jpg',
   'poster1.png',
+  'club - Copy.png',
+  'A2_poster_blue - Copy.png.jpg',
+  'poster1 - Copy.png.png',
 ];
 
 const titles = [
   'Club Paradiso',
   'Gentle Leash',
   'Club AI',
-  'Effect of Spring, Giverny',
-  'Mount Corcoran',
-  'A Sunday on La Grande Jatte'
 ];
 
 const description = [
@@ -33,9 +33,10 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const rootNode = new THREE.Object3D();
 scene.add(rootNode)
 
-let count = 3;
+let count = 6;
 for ( let i = 0; i< count; i++) {
   const texture = textureLoader.load(images[i]);
+  console.log(`Loaded texture: ${images[i]}`, texture);
   texture.colorSpace = THREE.SRGBColorSpace;
 
   const baseNode = new THREE.Object3D();
@@ -43,8 +44,8 @@ for ( let i = 0; i< count; i++) {
   rootNode.add(baseNode);
 
   const artwork = new THREE.Mesh(
-    new THREE.BoxGeometry(2, 3, 0.1),
-    new THREE.MeshBasicMaterial({ map: texture })
+    new THREE.BoxGeometry(3, 2, 0.1),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
   );
   artwork.position.z = -4;
   baseNode.add(artwork)
