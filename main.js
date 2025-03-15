@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Reflector } from 'https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/objects/Reflector.js';
-
+import { TWEEN } from 'https://unpkg.com/three@0.139.0/examples/jsm/libs/tween.module.min.js';
 const images = [
   '/public/club_paradiso_1.png',
   '/public/club_ai_2.png',
@@ -51,6 +51,7 @@ for ( let i = 0; i< count; i++) {
     new THREE.BoxGeometry(3.1, 4.1, 0.09),
     new THREE.MeshStandardMaterial({ color: 0x202020 })
   );
+  border.name = `Border_${i}`;
   border.position.z = -4;
   baseNode.add(border);
 
@@ -58,6 +59,7 @@ for ( let i = 0; i< count; i++) {
     new THREE.BoxGeometry(3, 4, 0.1),
     new THREE.MeshStandardMaterial({ map: texture })
   );
+  artwork.name = `Art_${i}`;
   artwork.position.z = -4;
   baseNode.add(artwork)
 
@@ -68,6 +70,7 @@ for ( let i = 0; i< count; i++) {
       transparent: true
      })
   );
+  leftArrow.name = `LeftArrow`;
   leftArrow.position.set(-1.8, 0, -4);
   baseNode.add(leftArrow);
 
@@ -78,12 +81,13 @@ for ( let i = 0; i< count; i++) {
       transparent: true
      })
   );
+  rightArrow.name = `RightArrow`;
   rightArrow.position.set(1.8, 0, -4);
   baseNode.add(rightArrow);
 }
 
 
-const spotlight = new THREE.SpotLight(0xffffff, 100.0, 10.0, 0.65, 0.5);
+const spotlight = new THREE.SpotLight(0xffffff, 150.0, 10.0, 0.65, 0.5);
 spotlight.position.set(0, 5, 0);
 spotlight.target.position.set(0, 0.5, -5);
 scene.add(spotlight);
@@ -101,7 +105,17 @@ mirror.position.y = -2.1;
 mirror.rotateX(-Math.PI / 2);
 scene.add(mirror);
 
+function rotateGallery(direction) {
+  const deltaY = direction * (2 * Math.PI / count);
+
+  new TWEEN.Tween(rootNode.rotation)
+    .to({ y: rootNode.rotation.y + deltaY })
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .start();
+}
+
 function animate() {
+  TWEEN.update();
 	renderer.render( scene, camera );
 }
 
@@ -114,3 +128,26 @@ window.addEventListener('resize', () => {
     window.innerWidth,
     window.innerHeight);
 })
+
+window.addEventListener('click', (ev) => {
+  const raycaster = new THREE.Raycaster();
+
+  const mouseNDC = new THREE.Vector2(
+    (ev.clientX / window.innerWidth) * 2 - 1,
+    -(ev.clientY / window.innerHeight) * 2 + 1,
+  );
+
+  raycaster.setFromCamera(mouseNDC, camera);
+
+  const intersections = raycaster.intersectObject(rootNode, true);
+  if (intersections.length > 0) {
+    if (intersections[0].object.name === 'LeftArrow') {
+      // console.log('Click on Left arrow');
+      rotateGallery(-1);
+    }
+    if (intersections[0].object.name === 'RightArrow') {
+      // console.log('Click on Right arrow');
+      rotateGallery(1);
+    }
+  }
+});
